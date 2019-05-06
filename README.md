@@ -1,21 +1,24 @@
 # zod.tv_transcode
 Decentralized Video Transcoder
 
-## To Run on local node
-Step 1: Create account for the contract and deploy the contract.
-```
-npm install
-near create_account --account_id id
-near deploy --account_id id
-```
+## What is it?
 
-Step 2:
-modify src/settings.js line that sets the contractName. Set it to id from step 1.
-```
-const contractName = "contractId"; /* TODO: fill this in! */
-```
+Decentralized Video Transcoder priced by supply / demand market of GPUs / FPGAs / Algorithm advantages.  
 
-Step 3:
-Open src/index.html in your browser.
-That's it!
+## What does this project contain/use/exemplify?
 
+- Functional Component React with Hooks for state (no Redux yay!)
+- ed25519 to Curve25519 conversion plus encrypt/decrypt with shared secret
+- smart contract based queue of jobs
+
+## What is missing?
+
+- Drone support
+- ?
+
+## What are drones 
+
+Drones are workers that fill transcode orders.  A drone fleet could be for example operated by 
+EVE who has a specilized proprietory VP9 encoder, just as well as a drone could be operated by Bob,
+that crypto miner who bought your mining rig for full price right before crypto winter started and 
+is trying to recouperate.
