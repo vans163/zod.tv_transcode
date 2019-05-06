@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zod - Transcoder</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Maven+Pro" rel="stylesheet">
+  <!-- Bulma Version 0.7.1-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+
+  <script src='https://unpkg.com/react@16.7.0-alpha.2/umd/react.development.js'></script>
+  <script src='https://unpkg.com/react-dom@16.7.0-alpha.2/umd/react-dom.development.js'></script>
+
+  <style type="text/css">
+      html, body {
+          background: #EFF3F4;
+          font-family: 'Maven Pro';
+      }
+      .navbar {
+          background-color: #fff;
+      }
+      /*img {
+          padding: 5px;
+          border: 1px solid #ccc;
+      }*/
+
+      .features {
+        padding: 1rem 0;
+      }
+      .box.cta {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
+      .card-image > .fa {
+        font-size: 8rem;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        color: #209cee;
+      }
+      .card-content .content {
+        font-size: 14px;
+        margin: 1rem 1rem;
+      }
+      .card-content .content h4 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .card {
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.18);
+        margin-bottom: 2rem;
+      }
+      .intro {
+        padding: 5rem 0;
+        text-align: center;
+      }
+      .sandbox {
+        padding: 5rem 0;
+      }
+      .tile.notification {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .is-shady {
+      animation: flyintoright .4s backwards;
+      background: #fff;
+      box-shadow: rgba(0, 0, 0, .1) 0 1px 0;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 10px;
+      position: relative;
+      transition: all .2s ease-in-out;
+      }
+      .is-shady:hover {
+      box-shadow: 0 10px 16px rgba(0, 0, 0, .13), 0 6px 6px rgba(0, 0, 0, .19);
+      }
+      /*adds font awesome stars*/
+      footer li:before {
+        content: '\f1b2';
+        font-family: 'FontAwesome';
+        float: left;
+        margin-left: -1.5em;
+        color: #147efb;
+      }
+
+
+      .divider-vertical {
+          height: 100%;
+          margin: 0 9px;
+          border-left: 1px solid #969696;
+          border-right: 1px solid #FFF;
+      }
+
+      .card-image:hover {
+          background: #000;
+          transform: scale(1.02, 1.02);
+          transition: .4s transform;
+          z-index: 10;
+      }
+
+      .card-image .image img {
+          opacity: 1;
+      }
+
+      .card-image .card-hover {
+          opacity: 0;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          z-index: 11;
+      }
+
+      .card-image .card-hover:hover {
+          /*opacity: 1;*/
+          opacity: 0.6;
+          transition: .1s opacity;
+          background: black;
+      }
+
+      .card-image .card-btns {
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          white-space: nowrap;
+          text-align: center;
+          margin-bottom: 4px;
+      }
+
+      .card-btn {
+          display: inline-block;
+          width: 32%;
+          text-align: center;
+          padding: 3px 20px;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.4;
+          text-transform: uppercase;
+          text-align: center;
+          color: #fff;
+          overflow: hidden;
+          vertical-align: middle;
+          touch-action: manipulation;
+          cursor: pointer;
+          border-radius: 4px;
+
+      }
+
+      .card-btn:hover {
+          color: #fff;
+      }
+
+      .btn-transparent {
+          background: transparent;
+          color: #F2F2F2;
+          -webkit-transition: background .2s ease-in-out, border .2s ease-in-out;
+          -moz-transition: background .2s ease-in-out, border .2s ease-in-out;
+          -o-transition: background .2s ease-in-out, border .2s ease-in-out;
+          transition: background .2s ease-in-out, border .2s ease-in-out;
+          /* border: 2px solid #b9bdbf;*/
+      }
+
+      .btn-transparent:hover {
+          color: white;
+          background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .cover {
+          opacity: 0.8;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          z-index: 12;
+          background: rgba(241, 241, 241, 0.77);
+      }
+  </style>
+
+</head>
+
+<body>
+
+  <div id="react_navbar">
+    <div>
+      <nav class="navbar"></nav>
+      <nav class="navbar is-transparent is-fixed-top has-shadow" style="box-shadow: rgba(10, 10, 10, 0.1) 0px 2px 3px;">
+        <div class="navbar-brand">
+          <span class="navbar-item">
+            <img src="https://maelstrom.network/images/mael_logo.png" alt="Description" style="cursor: pointer;"/>
+            <span style="cursor: default;">&nbsp;&nbsp;&nbsp;ZODTV - TRANSCODER</span>
+          </span>
+          <button class="button navbar-burger "></button>
+        </div>
+        <div class="navbar-menu ">
+          <div class="navbar-start"></div>
+          <div class="navbar-end">
+            <!-- <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Community</a>
+              <div class="navbar-dropdown is-boxed">
+                <a class="navbar-item" href="#">Blog (Medium)</a>
+                <hr class="navbar-divider">
+                <a class="navbar-item" href="https://t.me/zodtv8" target="_blank">Telegram</a>
+                <a class="navbar-item" href="https://discord.gg/jjBSjSF" target="_blank">Discord</a>
+                <hr class="navbar-divider"><a class="navbar-item" href="#" target="_blank">Twitter</a>
+              </div>
+            </div>
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">About</a>
+              <div class="navbar-dropdown is-boxed">
+                <a class="navbar-item" href="/about">About</a>
+                <hr class="navbar-divider">
+                <a class="navbar-item" href="/about#roadmap">Roadmap</a>
+              </div>
+            </div>
+            <div class="navbar-item">
+              <div class="field is-grouped">
+                <div class="navbar-item has-dropdown is-hoverable">
+                  <a class="navbar-link">
+                    <span class="icon"><i class="fas fa-cog"></i></span>
+                  </a>
+                  <div class="navbar-dropdown is-boxed">
+                    <a class="navbar-item">Settings</a>
+                    <hr class="navbar-divider">
+                    <a class="navbar-item">Log Out</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            -->
+          </div>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+  <div id="react_main_picker"></div>
+
+  <div class="container">
+    Contract says:
+    <h1 id="contract-message"></h1>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/nearlib@0.5.4/dist/nearlib.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tweetnacl/1.0.1/nacl-fast.min.js"></script>
+  <script src="./config.js"></script>
+  <script src="./main.js"></script>
+  <script src="/ed2curve.js"></script>
+  <script src="/crypto.js"></script>
+  <script src='/app.js'></script>
+</body>
+
+</html>
