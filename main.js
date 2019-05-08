@@ -15,6 +15,10 @@ async function initContract() {
   });
 }
 
+async function jobInsert(box, nonce) {
+    await contract.jobInsert({enc_json: box, enc_nonce: nonce});
+}
+
 // Using initialized contract
 async function doWork() {
   // Calling method hello on the blockchain for our contract.
@@ -28,5 +32,5 @@ async function doWork() {
 // Loads nearlib and this contract into window scope.
 
 window.nearInitPromise = initContract()
-  .then(doWork)
+  //.then(doWork)
   .catch(console.error);
