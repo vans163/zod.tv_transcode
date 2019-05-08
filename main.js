@@ -16,7 +16,13 @@ async function initContract() {
 }
 
 async function jobInsert(box, nonce) {
-    await contract.jobInsert({enc_json: box, enc_nonce: nonce});
+    var res = await contract.jobInsert({enc_json: box, enc_nonce: nonce});
+    console.log("jobInsert", res);
+    return res.status == "Completed";
+}
+
+async function getJobs() {
+    return await contract.getJobs();
 }
 
 // Using initialized contract

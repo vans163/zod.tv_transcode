@@ -272,9 +272,11 @@ function p_submitJob() {
     //var encrypted = encrypt_shared_box(json, my_pubkey, my_privkey, );
 }
 
+//var p_insertJob = async function() {
 async function p_insertJob() {
     store.setState("privkey_modal_submit_loading", true);
     await jobInsert(store.state.boxed_base58, store.state.nonce_base58);
+    //jobInsert(store.state.boxed_base58, store.state.nonce_base58);
     store.setState("privkey_modal_submit_loading", false);
 }
 
@@ -814,7 +816,7 @@ function PrivKeyModal() {
         </section>
         <footer class="modal-card-foot">
           <button class="button is-error" onClick={()=> setState("privkey_modal_open", false)}>Cancel</button>
-          <button class={"button "+s.privkey_modal_submit_loading ? "is-loading" : ""} onClick={()=> p_insertJob()}>Submit</button>
+          <button class={"button "+(s.privkey_modal_submit_loading ? "is-loading" : "")} onClick={()=> p_insertJob()}>Submit</button>
         </footer>
       </div>
     </div>;
