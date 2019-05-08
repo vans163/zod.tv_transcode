@@ -100,6 +100,7 @@
 }).call(this);
 
 
+//Thanks https://github.com/dchest/ed2curve-js
 /*
  * ed2curve: convert Ed25519 signing key pair into Curve25519
  * key pair suitable for Diffie-Hellman key exchange.

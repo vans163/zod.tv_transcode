@@ -6,7 +6,7 @@ import { MJob } from "./model.near";
 
 let jobMap: collections.Map<u64,MJob> = new collections.Map<u64,MJob>("job_map");
 
-export function jobInsert(enc_json: string): void {
+export function jobInsert(enc_json: string, enc_nonce: string): void {
     let next_job_id = storage.get<u64>("counter_job");
     storage.set<u64>("counter_job", next_job_id+1);
 
@@ -15,6 +15,7 @@ export function jobInsert(enc_json: string): void {
     job.block = context.blockIndex;
     job.owner = context.sender;
     job.job_enc_json = enc_json;
+    job.job_enc_nonce = enc_nonce;
     job.started_by = null;
     job.error_code = 0;
     job.error_text = null;

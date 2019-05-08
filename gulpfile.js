@@ -1,5 +1,6 @@
-//npm install --save-dev gulp-babel @babel/core @babel/preset-env @babel/preset-react @babel/preset-es2015
+//npm install --save-dev gulp-babel @babel/core @babel/preset-env @babel/preset-react @babel/preset-es2015 @babel/plugin-transform-runtime @babel/plugin-transform-modules-umd @babel/polyfill
 //npm install --save-dev gulp-replace gulp-util
+//npm i -D regenerator-runtime
 const gulp = require("gulp");
 const nearUtils = require("near-shell/gulp-utils");
 
@@ -19,10 +20,11 @@ gulp.task("build", ["build:bindings"], callback => {
   nearUtils.compile("../out/main.near.ts", "../out/main.wasm", callback);
 });
 
+//@babel/plugin-transform-runtime  @babel/plugin-transform-runtime
 gulp.task('build:react', () => {
   gulp.src('src/*.jsx')
     .pipe(greplace('class=', 'className='))
-    .pipe(babel({presets: ['@babel/preset-env', '@babel/preset-react']}))
+    .pipe(babel({presets: [['@babel/preset-env', {targets: {node: 10}}], '@babel/preset-react'], plugins: []}))
     .on('error', gutil.log)
     .pipe(gulp.dest('src/'));
 });
