@@ -733,8 +733,8 @@ function Jobs() {
                 <tr>
                   <th>{item.id}</th>
                   <td>{item.owner}</td>
-                  <td>{item.drone}</td>
-                  <td>{item.drone == null ? "Queued" : (item.done == true ? "Done" : "Working")}</td>
+                  <td>{item.started_by}</td>
+                  <td>{item.started_by == null ? "Queued" : (item.done == true ? "Done" : "Working")}</td>
                   <td>{item.error_code}</td>
                   <td>{item.error_text}</td>
                 </tr>

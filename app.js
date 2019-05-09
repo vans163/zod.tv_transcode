@@ -764,7 +764,7 @@ function Jobs() {
     onClick: () => p_getAllJobs()
   }, "Search"))))))), "Outputs", React.createElement("table", {
     className: "table is-bordered"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", null, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.drone), React.createElement("td", null, item.drone == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", null, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.started_by), React.createElement("td", null, item.started_by == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
 }
 
 function Help() {
