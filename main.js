@@ -21,6 +21,12 @@ async function jobInsert(box, nonce) {
     return res.status == "Completed";
 }
 
+async function jobDelete(id) {
+    var res = await contract.jobDelete({id: id});
+    console.log("jobDelete", res);
+    return res.status == "Completed";
+}
+
 async function getJobs() {
     return await contract.getJobs();
 }
