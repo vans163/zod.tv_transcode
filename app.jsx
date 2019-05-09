@@ -298,6 +298,12 @@ async function p_getAllJobs() {
     store.setState("job_table", jobs);
     store.setState("job_button_loading", false);
 }
+async function p_getJobsByNearAccount() {
+    store.setState("job_button_loading", true);
+    var jobs = await getJobsByAccount(s.j_job_acc);
+    store.setState("job_table", jobs);
+    store.setState("job_button_loading", false);
+}
 
 function MainPicker() {
     const [s, setState] = useStore();
