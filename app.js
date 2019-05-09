@@ -56,8 +56,10 @@ store.state = {
   privkey_modal_submit_loading: false,
   privKey_base58: "44zsbWT9Xk1RjJysfZaZ1qF8CpGQQ8yLP8Xk4ydqZ6GdGfiHPm5u7VbiUZRSiPkWwQAjJWpebcQZ1V58PTbPnHt3",
   //zod_tv3
-  zod_pubKey_base58: "9yfgNakMJNAcLumq6tmT3JkX9P4rNFmWf7zaLG3jLXpc" //transcode.zod.tv
-
+  zod_pubKey_base58: "9yfgNakMJNAcLumq6tmT3JkX9P4rNFmWf7zaLG3jLXpc",
+  //transcode.zod.tv
+  job_table: [],
+  job_button_loading: false
 };
 
 function round(value, decimals) {
@@ -186,6 +188,14 @@ function p_open_help(title) {
       body = ["Your job is encrypted before it goes on the blockchain, a shared secret is generated between the drone who will process your job." + "  The drone also is not able to peek at the job JSON using a recent advance in applicable cryptography, which is still being ironed out." + "  If you are curious it is similar technology to what dFinity is using.", "", "In summary, only you have access to the plaintext Json and everyone else sees the Encrypted blob, the drone operator working on your job only sees Encrypted blob.", "Welcome to decentralized trustless computing, strap in and bid 'The Cloud' goodbye!"];
       break;
 
+    case "By Job Id":
+      body = ["Find a single Job by Id. The Id is an incremental number.", ""];
+      break;
+
+    case "By Near Account Name":
+      body = ["Find all jobs belonging to a NEAR account. Your Near Account name is a string.", ""];
+      break;
+
     default:
       body = ["Unknown text, something wrong?"];
       break;
@@ -256,14 +266,19 @@ function p_submitJob() {
   store.setState("boxed_base58", boxed_base58);
   store.setState("nonce_base58", nonce_base58);
   store.setState("privkey_modal_open", true); //var encrypted = encrypt_shared_box(json, my_pubkey, my_privkey, );
-} //var p_insertJob = async function() {
-
+}
 
 async function p_insertJob() {
   store.setState("privkey_modal_submit_loading", true);
-  await jobInsert(store.state.boxed_base58, store.state.nonce_base58); //jobInsert(store.state.boxed_base58, store.state.nonce_base58);
-
+  await jobInsert(store.state.boxed_base58, store.state.nonce_base58);
   store.setState("privkey_modal_submit_loading", false);
+}
+
+async function p_getAllJobs() {
+  store.setState("job_button_loading", true);
+  var jobs = await getJobs();
+  store.setState("job_table", jobs);
+  store.setState("job_button_loading", false);
 }
 
 function MainPicker() {
@@ -678,7 +693,9 @@ function Jobs() {
     className: "column"
   }, React.createElement("div", {
     className: "field"
-  }, "By Job Id ", React.createElement("a", null, React.createElement("i", {
+  }, "By Job Id ", React.createElement("a", {
+    onClick: () => p_open_help("By Job Id")
+  }, React.createElement("i", {
     className: "far fa-question-circle",
     "aria-hidden": "true"
   })), React.createElement("div", {
@@ -700,12 +717,15 @@ function Jobs() {
   })))), React.createElement("div", {
     className: "control"
   }, React.createElement("button", {
-    className: "button"
+    className: "button " + (s.job_button_loading ? "is-loading" : ""),
+    onClick: () => p_getJobById()
   }, "Search")))))), React.createElement("div", {
     className: "column"
   }, React.createElement("div", {
     className: "field"
-  }, "By Near Account Name ", React.createElement("a", null, React.createElement("i", {
+  }, "By Near Account Name ", React.createElement("a", {
+    onClick: () => p_open_help("By Near Account Name")
+  }, React.createElement("i", {
     className: "far fa-question-circle",
     "aria-hidden": "true"
   })), React.createElement("div", {
@@ -727,7 +747,8 @@ function Jobs() {
   })))), React.createElement("div", {
     className: "control"
   }, React.createElement("button", {
-    className: "button"
+    className: "button " + (s.job_button_loading ? "is-loading" : ""),
+    onClick: () => p_getJobsByNearAccount()
   }, "Search")))))), React.createElement("div", {
     className: "column"
   }, React.createElement("div", {
@@ -739,10 +760,11 @@ function Jobs() {
   }, React.createElement("div", {
     className: "control"
   }, React.createElement("button", {
-    className: "button"
+    className: "button " + (s.job_button_loading ? "is-loading" : ""),
+    onClick: () => p_getAllJobs()
   }, "Search"))))))), "Outputs", React.createElement("table", {
     className: "table is-bordered"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, React.createElement("tr", null, React.createElement("th", null, "1"), React.createElement("td", null, "devnet331"), React.createElement("td", null, "devnet134141"), React.createElement("td", null, "Working"), React.createElement("td", null, "0"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("th", null, "2"), React.createElement("td", null, "devnet331"), React.createElement("td", null), React.createElement("td", null, "Queued"), React.createElement("td", null, "0"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("th", null, "3"), React.createElement("td", null, "devnet331"), React.createElement("td", null, "devnet3313"), React.createElement("td", null, "Finished"), React.createElement("td", null, "0"), React.createElement("td", null)), React.createElement("tr", null, React.createElement("th", null, "4"), React.createElement("td", null, "devnet331"), React.createElement("td", null, "devnet3313"), React.createElement("td", null, "Error"), React.createElement("td", null, "3"), React.createElement("td", null, "Source Video Width > 4096"))))));
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", null, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.drone), React.createElement("td", null, item.drone == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
 }
 
 function Help() {

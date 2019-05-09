@@ -47,6 +47,9 @@ store.state = {
     privKey_base58: "44zsbWT9Xk1RjJysfZaZ1qF8CpGQQ8yLP8Xk4ydqZ6GdGfiHPm5u7VbiUZRSiPkWwQAjJWpebcQZ1V58PTbPnHt3", //zod_tv3
 
     zod_pubKey_base58: "9yfgNakMJNAcLumq6tmT3JkX9P4rNFmWf7zaLG3jLXpc", //transcode.zod.tv
+
+    job_table: [],
+    job_button_loading: false, 
 }
 
 function round(value, decimals) {
@@ -200,6 +203,16 @@ function p_open_help(title) {
             "Welcome to decentralized trustless computing, strap in and bid 'The Cloud' goodbye!"
             ];
             break;
+        case "By Job Id":
+            body = ["Find a single Job by Id. The Id is an incremental number.",
+            "",
+            ];
+            break;
+        case "By Near Account Name":
+            body = ["Find all jobs belonging to a NEAR account. Your Near Account name is a string.",
+            "",
+            ];
+            break;
         default: 
             body = ["Unknown text, something wrong?"];
             break;
@@ -272,12 +285,17 @@ function p_submitJob() {
     //var encrypted = encrypt_shared_box(json, my_pubkey, my_privkey, );
 }
 
-//var p_insertJob = async function() {
 async function p_insertJob() {
     store.setState("privkey_modal_submit_loading", true);
     await jobInsert(store.state.boxed_base58, store.state.nonce_base58);
-    //jobInsert(store.state.boxed_base58, store.state.nonce_base58);
     store.setState("privkey_modal_submit_loading", false);
+}
+
+async function p_getAllJobs() {
+    store.setState("job_button_loading", true);
+    var jobs = await getJobs();
+    store.setState("job_table", jobs);
+    store.setState("job_button_loading", false);
 }
 
 function MainPicker() {
@@ -632,7 +650,7 @@ function Jobs() {
             <div class="column">
 
               <div class="field">
-                By Job Id <a><i class="far fa-question-circle" aria-hidden="true"></i></a>
+                By Job Id <a onClick={()=> p_open_help("By Job Id")}><i class="far fa-question-circle" aria-hidden="true"></i></a>
                 <div class="field-body">
                   <div class="field is-narrow has-addons">
                     <div class="control">
@@ -644,7 +662,7 @@ function Jobs() {
                       </div>
                     </div>
                     <div class="control">
-                      <button class="button">
+                      <button class={"button "+(s.job_button_loading?"is-loading":"")} onClick={()=> p_getJobById()}>
                         Search
                       </button>
                     </div>
@@ -656,7 +674,7 @@ function Jobs() {
             <div class="column">
 
               <div class="field">
-                By Near Account Name <a><i class="far fa-question-circle" aria-hidden="true"></i></a>
+                By Near Account Name <a onClick={()=> p_open_help("By Near Account Name")}><i class="far fa-question-circle" aria-hidden="true"></i></a>
                 <div class="field-body">
                   <div class="field is-narrow has-addons">
                     <div class="control">
@@ -668,7 +686,7 @@ function Jobs() {
                       </div>
                     </div>
                     <div class="control">
-                      <button class="button">
+                      <button class={"button "+(s.job_button_loading?"is-loading":"")} onClick={()=> p_getJobsByNearAccount()}>
                         Search
                       </button>
                     </div>
@@ -685,7 +703,7 @@ function Jobs() {
                 <div class="field-body">
                   <div class="field is-narrow has-addons">
                     <div class="control">
-                      <button class="button">
+                      <button class={"button "+(s.job_button_loading?"is-loading":"")} onClick={()=> p_getAllJobs()}>
                         Search
                       </button>
                     </div>
@@ -710,38 +728,18 @@ function Jobs() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <th>1</th>
-                <td>devnet331</td>
-                <td>devnet134141</td>
-                <td>Working</td>
-                <td>0</td>
-                <td></td>
-              </tr>
-              <tr>
-                <th>2</th>
-                <td>devnet331</td>
-                <td></td>
-                <td>Queued</td>
-                <td>0</td>
-                <td></td>
-              </tr>
-              <tr>
-                <th>3</th>
-                <td>devnet331</td>
-                <td>devnet3313</td>
-                <td>Finished</td>
-                <td>0</td>
-                <td></td>
-              </tr>
-              <tr>
-                <th>4</th>
-                <td>devnet331</td>
-                <td>devnet3313</td>
-                <td>Error</td>
-                <td>3</td>
-                <td>Source Video Width > 4096</td>
-              </tr>
+            {
+              s.job_table.map((item,idx)=> 
+                <tr>
+                  <th>{item.id}</th>
+                  <td>{item.owner}</td>
+                  <td>{item.drone}</td>
+                  <td>{item.drone == null ? "Queued" : (item.done == true ? "Done" : "Working")}</td>
+                  <td>{item.error_code}</td>
+                  <td>{item.error_text}</td>
+                </tr>
+              )
+            }
             </tbody>
            </table>
 
