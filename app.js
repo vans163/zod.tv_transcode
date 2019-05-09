@@ -59,7 +59,8 @@ store.state = {
   zod_pubKey_base58: "9yfgNakMJNAcLumq6tmT3JkX9P4rNFmWf7zaLG3jLXpc",
   //transcode.zod.tv
   job_table: [],
-  job_button_loading: false
+  job_button_loading: false,
+  j_job_acc: "devuser1557211012642"
 };
 
 function round(value, decimals) {
@@ -709,7 +710,8 @@ function Jobs() {
   }, React.createElement("input", {
     className: "input",
     type: "text",
-    value: "37"
+    value: s.j_job_id,
+    onChange: e => setState("j_job_id", e.target.value)
   }), React.createElement("span", {
     className: "icon is-small is-right is-success"
   }, React.createElement("i", {
@@ -739,7 +741,8 @@ function Jobs() {
   }, React.createElement("input", {
     className: "input",
     type: "text",
-    value: "devnet24324"
+    value: s.j_job_acc,
+    onChange: e => setState("j_job_acc", e.target.value)
   }), React.createElement("span", {
     className: "icon is-small is-right is-success"
   }, React.createElement("i", {

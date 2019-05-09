@@ -50,6 +50,7 @@ store.state = {
 
     job_table: [],
     job_button_loading: false, 
+    j_job_acc: "devuser1557211012642",
 }
 
 function round(value, decimals) {
@@ -655,7 +656,7 @@ function Jobs() {
                   <div class="field is-narrow has-addons">
                     <div class="control">
                       <div class="control has-icons-right">
-                        <input class="input" type="text" value="37"/>
+                        <input class="input" type="text" value={s.j_job_id} onChange={(e)=> setState("j_job_id", e.target.value)}/>
                         <span class="icon is-small is-right is-success">
                           <i class=""></i>
                         </span>
@@ -679,7 +680,7 @@ function Jobs() {
                   <div class="field is-narrow has-addons">
                     <div class="control">
                       <div class="control has-icons-right">
-                        <input class="input" type="text" value="devnet24324"/>
+                        <input class="input" type="text" value={s.j_job_acc} onChange={(e)=> setState("j_job_acc", e.target.value)}/>
                         <span class="icon is-small is-right is-success">
                           <i class=""></i>
                         </span>
