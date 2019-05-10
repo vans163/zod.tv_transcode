@@ -6,7 +6,7 @@ async function initContract() {
   window.contract = await near.loadContract(nearConfig.contractName, {
     // NOTE: This configuration only needed while NEAR is still in development
     // View methods are read only. They don't modify the state, but usually return some value.
-    viewMethods: ["getJobs", "getJob"],
+    viewMethods: ["getJobs", "getJob", "getJobsByAccount"],
     // Change methods can modify the state. But you don't receive the returned value when called.
     changeMethods: ["jobInsert", "jobDelete", "droneStartJob", "droneFinishJob", "incrementCounter"],
     // Sender is the account ID to initialize transactions.
@@ -21,8 +21,20 @@ async function jobInsert(box, nonce) {
     return res.status == "Completed";
 }
 
+async function jobDelete(id) {
+    var res = await contract.jobDelete({id: id});
+    console.log("jobDelete", res);
+    return res.status == "Completed";
+}
+
 async function getJobs() {
     return await contract.getJobs();
+}
+async function getJob(id) {
+    return await contract.getJob({id: id});
+}
+async function getJobsByAccount(account) {
+    return await contract.getJobsByAccount({account: account});
 }
 
 // Using initialized contract

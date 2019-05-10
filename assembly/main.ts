@@ -17,6 +17,7 @@ export function jobInsert(enc_json: string, enc_nonce: string): void {
     job.job_enc_json = enc_json;
     job.job_enc_nonce = enc_nonce;
     job.started_by = null;
+    //job.done = false;
     job.error_code = 0;
     job.error_text = null;
 
@@ -29,7 +30,7 @@ export function jobDelete(id: u64): void {
         return;
     }
     //Job already running, dont delete it
-    if (job.started_by != null) {
+    if (job.started_by != null && job.started_by != "") {
         return;
     }
     jobMap.delete(id);
@@ -40,6 +41,9 @@ export function getMyJobs(): Array<MJob> {
 }
 export function getJobs(): Array<MJob> {
     return jobMap.values();
+}
+export function getJobsByAccount(account: string): Array<MJob> {
+    return jobMap.values().filter(v => v.owner == account);
 }
 export function getJob(id: u64): MJob {
     return jobMap.get(id);
