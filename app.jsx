@@ -51,6 +51,7 @@ store.state = {
     job_table: [],
     job_button_loading: false, 
     j_job_acc: "devuser1557211012642",
+    j_job_id: "1",
 }
 
 function round(value, decimals) {
@@ -292,6 +293,16 @@ async function p_insertJob() {
     store.setState("privkey_modal_submit_loading", false);
 }
 
+async function p_getJobById() {
+    store.setState("job_button_loading", true);
+    var job = await getJob(store.state.j_job_id);
+    if (job == null) {
+        store.setState("job_table", []);
+    } else {
+        store.setState("job_table", [job]);
+    }
+    store.setState("job_button_loading", false);
+}
 async function p_getAllJobs() {
     store.setState("job_button_loading", true);
     var jobs = await getJobs();
@@ -300,7 +311,8 @@ async function p_getAllJobs() {
 }
 async function p_getJobsByNearAccount() {
     store.setState("job_button_loading", true);
-    var jobs = await getJobsByAccount(s.j_job_acc);
+    var jobs = await getJobs();
+    jobs = jobs.filter(v => v.owner == store.state.j_job_acc);
     store.setState("job_table", jobs);
     store.setState("job_button_loading", false);
 }
@@ -661,11 +673,8 @@ function Jobs() {
                 <div class="field-body">
                   <div class="field is-narrow has-addons">
                     <div class="control">
-                      <div class="control has-icons-right">
+                      <div class="control">
                         <input class="input" type="text" value={s.j_job_id} onChange={(e)=> setState("j_job_id", e.target.value)}/>
-                        <span class="icon is-small is-right is-success">
-                          <i class=""></i>
-                        </span>
                       </div>
                     </div>
                     <div class="control">
@@ -737,7 +746,7 @@ function Jobs() {
             <tbody>
             {
               s.job_table.map((item,idx)=> 
-                <tr>
+                <tr key={item.id}>
                   <th>{item.id}</th>
                   <td>{item.owner}</td>
                   <td>{item.started_by}</td>

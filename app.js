@@ -60,7 +60,8 @@ store.state = {
   //transcode.zod.tv
   job_table: [],
   job_button_loading: false,
-  j_job_acc: "devuser1557211012642"
+  j_job_acc: "devuser1557211012642",
+  j_job_id: "1"
 };
 
 function round(value, decimals) {
@@ -275,6 +276,19 @@ async function p_insertJob() {
   store.setState("privkey_modal_submit_loading", false);
 }
 
+async function p_getJobById() {
+  store.setState("job_button_loading", true);
+  var job = await getJob(store.state.j_job_id);
+
+  if (job == null) {
+    store.setState("job_table", []);
+  } else {
+    store.setState("job_table", [job]);
+  }
+
+  store.setState("job_button_loading", false);
+}
+
 async function p_getAllJobs() {
   store.setState("job_button_loading", true);
   var jobs = await getJobs();
@@ -284,7 +298,8 @@ async function p_getAllJobs() {
 
 async function p_getJobsByNearAccount() {
   store.setState("job_button_loading", true);
-  var jobs = await getJobsByAccount(s.j_job_acc);
+  var jobs = await getJobs();
+  jobs = jobs.filter(v => v.owner == store.state.j_job_acc);
   store.setState("job_table", jobs);
   store.setState("job_button_loading", false);
 }
@@ -713,17 +728,13 @@ function Jobs() {
   }, React.createElement("div", {
     className: "control"
   }, React.createElement("div", {
-    className: "control has-icons-right"
+    className: "control"
   }, React.createElement("input", {
     className: "input",
     type: "text",
     value: s.j_job_id,
     onChange: e => setState("j_job_id", e.target.value)
-  }), React.createElement("span", {
-    className: "icon is-small is-right is-success"
-  }, React.createElement("i", {
-    className: ""
-  })))), React.createElement("div", {
+  }))), React.createElement("div", {
     className: "control"
   }, React.createElement("button", {
     className: "button " + (s.job_button_loading ? "is-loading" : ""),
@@ -774,7 +785,9 @@ function Jobs() {
     onClick: () => p_getAllJobs()
   }, "Search"))))))), "Outputs", React.createElement("table", {
     className: "table is-bordered"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", null, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.started_by), React.createElement("td", null, item.started_by == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", {
+    key: item.id
+  }, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.started_by), React.createElement("td", null, item.started_by == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
 }
 
 function Help() {
