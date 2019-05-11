@@ -16,8 +16,8 @@ export function jobInsert(enc_json: string, enc_nonce: string): void {
     job.owner = context.sender;
     job.job_enc_json = enc_json;
     job.job_enc_nonce = enc_nonce;
-    job.started_by = null;
-    //job.done = false;
+    job.drone = null;
+    job.done = false;
     job.error_code = 0;
     job.error_text = null;
 
@@ -26,14 +26,24 @@ export function jobInsert(enc_json: string, enc_nonce: string): void {
 
 export function jobDelete(id: u64): void {
     let job = jobMap.get(id);
-    if (job == null || job.owner != context.sender) {
+    if (job == null) {
+        near.log("Job by "+id.toString()+" does not exist.");
         return;
     }
-    //Job already running, dont delete it
-    if (job.started_by != null && job.started_by != "") {
-        return;
+    if (context.sender == context.contractName) {
+        jobMap.delete(id);
+    } else {
+        if (job.owner != context.sender) {
+            near.log("Job by "+id.toString()+" is not owned by you.");
+            return;
+        }
+        //Job already running, dont delete it
+        if (job.drone != null && job.drone != "") {
+            near.log("Job by "+id.toString()+" is already started by "+job.drone+". Wait until completion or timeout before deleting.");
+            return;
+        }
+        jobMap.delete(id);
     }
-    jobMap.delete(id);
 }
 
 export function getMyJobs(): Array<MJob> {

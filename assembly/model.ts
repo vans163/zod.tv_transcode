@@ -16,7 +16,7 @@ export class MJob {
     owner: string;
     job_enc_json: string;
     job_enc_nonce: string;
-    started_by: string;
+    drone: string;
     done: boolean;
     error_code: i32;
     error_text: string;
