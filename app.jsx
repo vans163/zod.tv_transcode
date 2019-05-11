@@ -28,6 +28,9 @@ function useStore() {
     return [ state, store.setState ];
 }
 
+window.walletAccount = new nearlib.WalletAccount("transcode.zod.tv", "https://wallet.nearprotocol.com");
+console.log("signed in?", window.walletAccount.isSignedIn());
+
 store.state = {
     navbar_burger: false,
 
@@ -52,6 +55,9 @@ store.state = {
     job_button_loading: false, 
     j_job_acc: "devuser1557211012642",
     j_job_id: "1",
+
+    wallet_signed_in: window.walletAccount.isSignedIn(),
+    wallet_account_name: window.walletAccount.getAccountId(),
 }
 
 function round(value, decimals) {
@@ -316,6 +322,22 @@ async function p_getJobsByNearAccount() {
     store.setState("job_table", jobs);
     store.setState("job_button_loading", false);
 }
+
+function p_near_signin() {
+  window.walletAccount.requestSignIn(
+      "transcode.zod.tv", 
+      "Zod.TV - Transcode", 
+      location.href,
+      location.href);
+}
+
+function p_near_signout() {
+    window.walletAccount.signOut();
+    store.setState("wallet_signed_in", false);
+    store.setState("wallet_account_name", "");
+    window.history.replaceState({}, document.title, "/");
+}
+
 
 function MainPicker() {
     const [s, setState] = useStore();
@@ -749,8 +771,8 @@ function Jobs() {
                 <tr key={item.id}>
                   <th>{item.id}</th>
                   <td>{item.owner}</td>
-                  <td>{item.started_by}</td>
-                  <td>{item.started_by == null ? "Queued" : (item.done == true ? "Done" : "Working")}</td>
+                  <td>{item.drone}</td>
+                  <td>{item.drone == null ? "Queued" : (item.done == true ? "Done" : "Working")}</td>
                   <td>{item.error_code}</td>
                   <td>{item.error_text}</td>
                 </tr>
@@ -836,6 +858,65 @@ function PrivKeyModal() {
     </div>;
 }
 
+function NavBar() {
+    const [s, setState] = useStore();
+
+    return <div>
+      <div>
+        <nav class="navbar"></nav>
+        <nav class="navbar is-transparent is-fixed-top has-shadow" style={{boxShadow: "rgba(10, 10, 10, 0.1) 0px 2px 3px"}}>
+          <div class="navbar-brand">
+            <span class="navbar-item">
+              <img src="https://cdn.shopify.com/s/files/1/2312/7883/products/19-1_1400x.png?v=1539110648" alt="Description" style={{cursor: "pointer"}}/>
+              <span style={{cursor: "default"}}>&nbsp;&nbsp;ZODTV - TRANSCODE</span>
+            </span>
+            <button class="button navbar-burger "></button>
+          </div>
+          <div class="navbar-menu ">
+            <div class="navbar-start"></div>
+            <div class="navbar-end">
+
+            {s.wallet_signed_in == false &&
+              <div class="navbar-item">
+                <div class="field is-grouped">
+                  <p class="control">
+                    <a class="button" href="#" onClick={()=> p_near_signin()}>
+                      <span class="icon">
+                        <i class="fas fa-link"></i>
+                      </span>
+                      <span>Login with NEAR</span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            }
+
+            {s.wallet_signed_in == true &&
+              [
+              <div key="1" class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">{s.wallet_account_name}</a>
+              </div>,
+
+              <div key="2" class="navbar-item">
+                <div class="field is-grouped">
+                  <p class="control">
+                    <a class="button" href="#" onClick={()=> p_near_signout()}>
+                      <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                      </span>
+                      <span>Logout</span>
+                    </a>
+                  </p>
+                </div>
+              </div>]
+            }
+
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>;
+}
 
 
 /*
@@ -926,6 +1007,8 @@ function PrivKeyModal() {
   </div>
 </section>
 */
+
+ReactDOM.render(React.createElement(NavBar,{},null), document.getElementById("react_navbar"));
 ReactDOM.render(React.createElement(MainPicker,{},null), document.getElementById("react_main_picker"));
 ReactDOM.render(React.createElement(HelpModal,{},null), document.getElementById("react_help_modal"));
 ReactDOM.render(React.createElement(PrivKeyModal,{},null), document.getElementById("react_privkey_modal"));

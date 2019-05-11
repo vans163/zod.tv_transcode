@@ -31,6 +31,8 @@ function useStore() {
   return [state, store.setState];
 }
 
+window.walletAccount = new nearlib.WalletAccount("transcode.zod.tv", "https://wallet.nearprotocol.com");
+console.log("signed in?", window.walletAccount.isSignedIn());
 store.state = {
   navbar_burger: false,
   tab_view_tab: "create_job",
@@ -61,7 +63,9 @@ store.state = {
   job_table: [],
   job_button_loading: false,
   j_job_acc: "devuser1557211012642",
-  j_job_id: "1"
+  j_job_id: "1",
+  wallet_signed_in: window.walletAccount.isSignedIn(),
+  wallet_account_name: window.walletAccount.getAccountId()
 };
 
 function round(value, decimals) {
@@ -302,6 +306,17 @@ async function p_getJobsByNearAccount() {
   jobs = jobs.filter(v => v.owner == store.state.j_job_acc);
   store.setState("job_table", jobs);
   store.setState("job_button_loading", false);
+}
+
+function p_near_signin() {
+  window.walletAccount.requestSignIn("transcode.zod.tv", "Zod.TV - Transcode", location.href, location.href);
+}
+
+function p_near_signout() {
+  window.walletAccount.signOut();
+  store.setState("wallet_signed_in", false);
+  store.setState("wallet_account_name", "");
+  window.history.replaceState({}, document.title, "/");
 }
 
 function MainPicker() {
@@ -787,7 +802,7 @@ function Jobs() {
     className: "table is-bordered"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", {
     key: item.id
-  }, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.started_by), React.createElement("td", null, item.started_by == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
+  }, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.drone), React.createElement("td", null, item.drone == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
 }
 
 function Help() {
@@ -906,6 +921,74 @@ function PrivKeyModal() {
     onClick: () => p_insertJob()
   }, "Submit"))));
 }
+
+function NavBar() {
+  const [s, setState] = useStore();
+  return React.createElement("div", null, React.createElement("div", null, React.createElement("nav", {
+    className: "navbar"
+  }), React.createElement("nav", {
+    className: "navbar is-transparent is-fixed-top has-shadow",
+    style: {
+      boxShadow: "rgba(10, 10, 10, 0.1) 0px 2px 3px"
+    }
+  }, React.createElement("div", {
+    className: "navbar-brand"
+  }, React.createElement("span", {
+    className: "navbar-item"
+  }, React.createElement("img", {
+    src: "https://cdn.shopify.com/s/files/1/2312/7883/products/19-1_1400x.png?v=1539110648",
+    alt: "Description",
+    style: {
+      cursor: "pointer"
+    }
+  }), React.createElement("span", {
+    style: {
+      cursor: "default"
+    }
+  }, "\xA0\xA0ZODTV - TRANSCODE")), React.createElement("button", {
+    className: "button navbar-burger "
+  })), React.createElement("div", {
+    className: "navbar-menu "
+  }, React.createElement("div", {
+    className: "navbar-start"
+  }), React.createElement("div", {
+    className: "navbar-end"
+  }, s.wallet_signed_in == false && React.createElement("div", {
+    className: "navbar-item"
+  }, React.createElement("div", {
+    className: "field is-grouped"
+  }, React.createElement("p", {
+    className: "control"
+  }, React.createElement("a", {
+    className: "button",
+    href: "#",
+    onClick: () => p_near_signin()
+  }, React.createElement("span", {
+    className: "icon"
+  }, React.createElement("i", {
+    className: "fas fa-link"
+  })), React.createElement("span", null, "Login with NEAR"))))), s.wallet_signed_in == true && [React.createElement("div", {
+    key: "1",
+    className: "navbar-item has-dropdown is-hoverable"
+  }, React.createElement("a", {
+    className: "navbar-link"
+  }, s.wallet_account_name)), React.createElement("div", {
+    key: "2",
+    className: "navbar-item"
+  }, React.createElement("div", {
+    className: "field is-grouped"
+  }, React.createElement("p", {
+    className: "control"
+  }, React.createElement("a", {
+    className: "button",
+    href: "#",
+    onClick: () => p_near_signout()
+  }, React.createElement("span", {
+    className: "icon"
+  }, React.createElement("i", {
+    className: "fas fa-sign-out-alt"
+  })), React.createElement("span", null, "Logout")))))])))));
+}
 /*
 <section className="container" style="padding: 10px; margin-bottom: 20px; margin-top: 10px; ">
   <div className="card">
@@ -996,6 +1079,7 @@ function PrivKeyModal() {
 */
 
 
+ReactDOM.render(React.createElement(NavBar, {}, null), document.getElementById("react_navbar"));
 ReactDOM.render(React.createElement(MainPicker, {}, null), document.getElementById("react_main_picker"));
 ReactDOM.render(React.createElement(HelpModal, {}, null), document.getElementById("react_help_modal"));
 ReactDOM.render(React.createElement(PrivKeyModal, {}, null), document.getElementById("react_privkey_modal"));
