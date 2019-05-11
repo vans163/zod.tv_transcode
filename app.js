@@ -798,7 +798,7 @@ function Jobs() {
   }, React.createElement("button", {
     className: "button " + (s.job_button_loading ? "is-loading" : ""),
     onClick: () => p_getAllJobs()
-  }, "Search"))))))), "Outputs", React.createElement("table", {
+  }, "Search"))))))), "Jobs", React.createElement("table", {
     className: "table is-bordered"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", {
     key: item.id
@@ -989,96 +989,61 @@ function NavBar() {
     className: "fas fa-sign-out-alt"
   })), React.createElement("span", null, "Logout")))))])))));
 }
-/*
-<section className="container" style="padding: 10px; margin-bottom: 20px; margin-top: 10px; ">
-  <div className="card">
-    <header className="card-header">
-      <div className="tabs is-boxed">
-        <ul>
-          <li className="is-active">
-            <a>
-              <span className="icon is-small"><i className="fas fa-image" aria-hidden="true"></i></span>
-              <span>Create Job</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <span className="icon is-small"><i className="fas fa-film" aria-hidden="true"></i></span>
-              <span>Jobs</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <span className="icon is-small"><i className="far fa-file-alt" aria-hidden="true"></i></span>
-              <span>Help</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </header>
-    <div className="card-content">
-      <div className="content">
-        
-        <div className="field">
-          Source <a><i className="far fa-question-circle" aria-hidden="true"></i></a>
 
-          <div className="field-body">
-            <div className="field has-addons">
-              <div className="control is-expanded">
-                <div className="control has-icons-right">
-                  <input className="input" type="text" value="s3://sys.wasabi.com/myBucket/myVideo.mp4">
-                  <span className="icon is-small is-right is-success">
-                    <i className=""></i>
-                  </span>
-                </div>
-              </div>
-              <div className="control">
-                <button className="button" >
-                  Check
-                </button>
-              </div>
-            </div>
-          </div>
+async function initContract() {
+  // Initializing connection to the NEAR DevNet.
+  window.near = await nearlib.dev.connect(nearConfig); // Initializing our contract APIs by contract name and configuration.
 
-          <!-- <div className="control">
-            <input className="input is-primary" type="text" placeholder="Primary input">
-          </div> -->
-        </div>
+  window.contract = await near.loadContract(nearConfig.contractName, {
+    // NOTE: This configuration only needed while NEAR is still in development
+    // View methods are read only. They don't modify the state, but usually return some value.
+    viewMethods: ["getJobs", "getJob", "getJobsByAccount"],
+    // Change methods can modify the state. But you don't receive the returned value when called.
+    changeMethods: ["jobInsert", "jobDelete", "droneStartJob", "droneFinishJob", "incrementCounter"],
+    // Sender is the account ID to initialize transactions.
+    // For devnet we create accounts on demand. See other examples on how to authorize accounts.
+    sender: nearlib.dev.myAccountId //sender: window.walletAccount.getAccountId()
 
-        Outputs
-        <div className="tabs is-boxed">
-          <ul style="margin-left: 0em; margin-top: 0em">
-            <li className="is-active">
-              <a>
-                <span>Output 1</span>
-              </a>
-            </li>
-            <li>
-              <a>
-                <span className="icon is-small"><i className="far fa-plus-square" aria-hidden="true"></i></span>
-              </a>
-            </li>
-          </ul>
-        </div>
+  });
+}
 
-        <div className="field">
-          <div className="control">
-            <input className="input is-primary" type="text" placeholder="Primary input">
-          </div>
-        </div>
+async function jobInsert(box, nonce) {
+  var res = await contract.jobInsert({
+    enc_json: box,
+    enc_nonce: nonce
+  });
+  console.log("jobInsert", res);
+  return res.status == "Completed";
+}
+
+async function jobDelete(id) {
+  var res = await contract.jobDelete({
+    id: id
+  });
+  console.log("jobDelete", res);
+  return res.status == "Completed";
+}
+
+async function getJobs() {
+  return await contract.getJobs();
+}
+
+async function getJob(id) {
+  return await contract.getJob({
+    id: id
+  });
+}
+
+async function getJobsByAccount(account) {
+  return await contract.getJobsByAccount({
+    account: account
+  });
+} // COMMON CODE BELOW:
+// Loads nearlib and this contract into window scope.
 
 
-      </div>
-    </div>
-    <footer className="card-footer">
-      <a href="#" className="card-footer-item">Clear</a>
-      <a href="#" className="card-footer-item">Submit</a>
-    </footer>
-  </div>
-</section>
-*/
-
-
+window.nearInitPromise = initContract() //.then(doWork)
+.catch(console.error);
 ReactDOM.render(React.createElement(NavBar, {}, null), document.getElementById("react_navbar"));
 ReactDOM.render(React.createElement(MainPicker, {}, null), document.getElementById("react_main_picker"));
 ReactDOM.render(React.createElement(HelpModal, {}, null), document.getElementById("react_help_modal"));
