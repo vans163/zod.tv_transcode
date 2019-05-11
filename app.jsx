@@ -944,7 +944,7 @@ async function jobInsert(box, nonce) {
 }
 
 async function jobDelete(id) {
-    var res = await contract.jobDelete({id: id});
+    var res = await contract.jobDelete({id: Number(id)});
     console.log("jobDelete", res);
     return res.status == "Completed";
 }
@@ -953,7 +953,7 @@ async function getJobs() {
     return await contract.getJobs();
 }
 async function getJob(id) {
-    return await contract.getJob({id: id});
+    return await contract.getJob({id: Number(id)});
 }
 async function getJobsByAccount(account) {
     return await contract.getJobsByAccount({account: account});

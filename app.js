@@ -1018,7 +1018,7 @@ async function jobInsert(box, nonce) {
 
 async function jobDelete(id) {
   var res = await contract.jobDelete({
-    id: id
+    id: Number(id)
   });
   console.log("jobDelete", res);
   return res.status == "Completed";
@@ -1030,7 +1030,7 @@ async function getJobs() {
 
 async function getJob(id) {
   return await contract.getJob({
-    id: id
+    id: Number(id)
   });
 }
 
