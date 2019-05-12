@@ -11,7 +11,7 @@ export class MMetadataJob {
 }
 
 export class MJob {
-    id: u64;
+    id: i32;
     block: u64;
     owner: string;
     job_enc_json: string;

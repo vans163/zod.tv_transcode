@@ -4,11 +4,11 @@ export { memory };
 import { context, storage, collections, near } from "./near";
 import { MJob } from "./model.near";
 
-let jobMap: collections.Map<u64,MJob> = new collections.Map<u64,MJob>("job_map");
+let jobMap: collections.Map<i32,MJob> = new collections.Map<i32,MJob>("job_map");
 
 export function jobInsert(enc_json: string, enc_nonce: string): void {
-    let next_job_id = storage.get<u64>("counter_job");
-    storage.set<u64>("counter_job", next_job_id+1);
+    let next_job_id = storage.get<i32>("counter_job");
+    storage.set<i32>("counter_job", next_job_id+1);
 
     let job = new MJob();
     job.id = next_job_id;
@@ -24,7 +24,7 @@ export function jobInsert(enc_json: string, enc_nonce: string): void {
     jobMap.set(next_job_id, job);
 }
 
-export function jobDelete(id: u64): void {
+export function jobDelete(id: i32): void {
     let job = jobMap.get(id);
     if (job == null) {
         near.log("Job by "+id.toString()+" does not exist.");
@@ -55,7 +55,7 @@ export function getJobs(): Array<MJob> {
 export function getJobsByAccount(account: string): Array<MJob> {
     return jobMap.values().filter(v => v.owner == account);
 }
-export function getJob(id: u64): MJob {
+export function getJob(id: i32): MJob {
     return jobMap.get(id);
 }
 
