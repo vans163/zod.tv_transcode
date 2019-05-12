@@ -53,7 +53,7 @@ store.state = {
 
     job_table: [],
     job_button_loading: false, 
-    j_job_acc: "devuser1557211012642",
+    j_job_acc: "zod.near",
     j_job_id: "1",
 
     wallet_signed_in: window.walletAccount.isSignedIn(),
@@ -199,16 +199,12 @@ function p_open_help(title) {
             ];
             break;
         case "Job Json":
-            body = ["This is how your job looks before being encrypted. Only you can see this.",
+            body = ["This is how your job looks before being encrypted. Only you can see this (and drone for now..).",
             ];
             break;
         case "Job Encrypted":
-            body = ["Your job is encrypted before it goes on the blockchain, a shared secret is generated between the drone who will process your job."
-            + "  The drone also is not able to peek at the job JSON using a recent advance in applicable cryptography, which is still being ironed out."
-            + "  If you are curious it is similar technology to what dFinity is using.",
+            body = ["This is how your job looks after encryption. Everyone can see this.",
             "",
-            "In summary, only you have access to the plaintext Json and everyone else sees the Encrypted blob, the drone operator working on your job only sees Encrypted blob.",
-            "Welcome to decentralized trustless computing, strap in and bid 'The Cloud' goodbye!"
             ];
             break;
         case "By Job Id":
@@ -415,8 +411,10 @@ function CreateJob() {
         </div>
       </div>,
       <footer key="footer_create_job" class="card-footer">
-        <a href="#" class="card-footer-item">Clear</a>
-        <a href="#" class="card-footer-item" onClick={()=> p_submitJob()}>Submit</a>
+        {/*<a href="#" class="card-footer-item">Clear</a>*/}
+        {s.wallet_signed_in && <a href="#" class="card-footer-item" onClick={()=> p_submitJob()}>Submit</a>}
+        {s.wallet_signed_in == false && <a class="card-footer-item">Submit (You must sign in)</a>}
+        
       </footer>
     ]
 }
@@ -758,7 +756,7 @@ function Jobs() {
             <thead>
               <tr>
                 <th>Id</th>
-                <th>Account</th>                
+                <th>Requester</th>                
                 <th>Drone</th>
                 <th>Status</th>
                 <th>Error Code</th>
@@ -789,7 +787,16 @@ function Jobs() {
 function Help() {
     const [s, setState] = useStore();
 
-    return [];
+    return <div class="card-content">
+      <div class="content">
+        <p>Video Transcoding is the process of turning high quality (4k) video into lower resolutions / codecs so all devices and internet connections can play it.</p>
+        <p>Globally, Video traffic will be 82 percent of all IP traffic by 2022. <a href="https://www.cisco.com/c/en/us/solutions/collateral/service-provider/visual-networking-index-vni/white-paper-c11-741490.html" target="_blank">Link</a></p>
+        <p>Zod.TV Transcoder is two part, consumers and providers.  Consumers need videos transcoded.  Providers do the transcoding.</p>
+        <p>Due to advances in applied cryptography, providers will use a technology similar to what dFinity is using.  This protects your secrets, 
+        like your API Keys for S3 cloud storage from the provider, even if the provider has physical access and root to the machine your job is running on.</p>
+        <p>Your secrets are safe, but the work gets done. Welcome to the new age of decentralization, bid 'The Cloud' farewell!</p>
+      </div>
+    </div>;
 }
 
 function HelpModal() {
@@ -894,7 +901,7 @@ function NavBar() {
             {s.wallet_signed_in == true &&
               [
               <div key="1" class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link">{s.wallet_account_name}</a>
+                <a class="navbar-item">{s.wallet_account_name}</a> {/* navbar-link */}
               </div>,
 
               <div key="2" class="navbar-item">
@@ -919,9 +926,18 @@ function NavBar() {
 }
 
 
+//const nearClient = new nearlib.NearClient(
+  //window.walletAccount, 
+  //new nearlib.LocalNodeConnection(nearConfig.nodeUrl));
+
 async function initContract() {
   // Initializing connection to the NEAR DevNet.
-  window.near = await nearlib.dev.connect(nearConfig);
+  //window.near = await nearlib.dev.connect(nearConfig);
+
+  const nearClient = new nearlib.NearClient(
+    window.walletAccount, 
+    new nearlib.LocalNodeConnection(nearConfig.nodeUrl));
+  window.near = new nearlib.Near(nearClient);
 
   // Initializing our contract APIs by contract name and configuration.
   window.contract = await near.loadContract(nearConfig.contractName, {
@@ -932,8 +948,8 @@ async function initContract() {
     changeMethods: ["jobInsert", "jobDelete", "droneStartJob", "droneFinishJob", "incrementCounter"],
     // Sender is the account ID to initialize transactions.
     // For devnet we create accounts on demand. See other examples on how to authorize accounts.
-    sender: nearlib.dev.myAccountId
-    //sender: window.walletAccount.getAccountId()
+    //sender: nearlib.dev.myAccountId
+    sender: window.walletAccount.getAccountId()
   });
 }
 

@@ -62,7 +62,7 @@ store.state = {
   //transcode.zod.tv
   job_table: [],
   job_button_loading: false,
-  j_job_acc: "devuser1557211012642",
+  j_job_acc: "zod.near",
   j_job_id: "1",
   wallet_signed_in: window.walletAccount.isSignedIn(),
   wallet_account_name: window.walletAccount.getAccountId()
@@ -187,11 +187,11 @@ function p_open_help(title) {
       break;
 
     case "Job Json":
-      body = ["This is how your job looks before being encrypted. Only you can see this."];
+      body = ["This is how your job looks before being encrypted. Only you can see this (and drone for now..)."];
       break;
 
     case "Job Encrypted":
-      body = ["Your job is encrypted before it goes on the blockchain, a shared secret is generated between the drone who will process your job." + "  The drone also is not able to peek at the job JSON using a recent advance in applicable cryptography, which is still being ironed out." + "  If you are curious it is similar technology to what dFinity is using.", "", "In summary, only you have access to the plaintext Json and everyone else sees the Encrypted blob, the drone operator working on your job only sees Encrypted blob.", "Welcome to decentralized trustless computing, strap in and bid 'The Cloud' goodbye!"];
+      body = ["This is how your job looks after encryption. Everyone can see this.", ""];
       break;
 
     case "By Job Id":
@@ -399,14 +399,13 @@ function CreateJob() {
   }, "Check"))))), "Outputs", React.createElement(CreateJobOutputs, null))), React.createElement("footer", {
     key: "footer_create_job",
     className: "card-footer"
-  }, React.createElement("a", {
-    href: "#",
-    className: "card-footer-item"
-  }, "Clear"), React.createElement("a", {
+  }, s.wallet_signed_in && React.createElement("a", {
     href: "#",
     className: "card-footer-item",
     onClick: () => p_submitJob()
-  }, "Submit"))];
+  }, "Submit"), s.wallet_signed_in == false && React.createElement("a", {
+    className: "card-footer-item"
+  }, "Submit (You must sign in)"))];
 }
 
 function CreateJobOutputs() {
@@ -800,14 +799,21 @@ function Jobs() {
     onClick: () => p_getAllJobs()
   }, "Search"))))))), "Jobs", React.createElement("table", {
     className: "table is-bordered"
-  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Account"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", {
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Id"), React.createElement("th", null, "Requester"), React.createElement("th", null, "Drone"), React.createElement("th", null, "Status"), React.createElement("th", null, "Error Code"), React.createElement("th", null, "Error Text"))), React.createElement("tbody", null, s.job_table.map((item, idx) => React.createElement("tr", {
     key: item.id
   }, React.createElement("th", null, item.id), React.createElement("td", null, item.owner), React.createElement("td", null, item.drone), React.createElement("td", null, item.drone == null ? "Queued" : item.done == true ? "Done" : "Working"), React.createElement("td", null, item.error_code), React.createElement("td", null, item.error_text)))))));
 }
 
 function Help() {
   const [s, setState] = useStore();
-  return [];
+  return React.createElement("div", {
+    className: "card-content"
+  }, React.createElement("div", {
+    className: "content"
+  }, React.createElement("p", null, "Video Transcoding is the process of turning high quality (4k) video into lower resolutions / codecs so all devices and internet connections can play it."), React.createElement("p", null, "Globally, Video traffic will be 82 percent of all IP traffic by 2022. ", React.createElement("a", {
+    href: "https://www.cisco.com/c/en/us/solutions/collateral/service-provider/visual-networking-index-vni/white-paper-c11-741490.html",
+    target: "_blank"
+  }, "Link")), React.createElement("p", null, "Zod.TV Transcoder is two part, consumers and providers.  Consumers need videos transcoded.  Providers do the transcoding."), React.createElement("p", null, "Due to advances in applied cryptography, providers will use a technology similar to what dFinity is using.  This protects your secrets, like your API Keys for S3 cloud storage from the provider, even if the provider has physical access and root to the machine your job is running on."), React.createElement("p", null, "Your secrets are safe, but the work gets done. Welcome to the new age of decentralization, bid 'The Cloud' farewell!")));
 }
 
 function HelpModal() {
@@ -971,8 +977,8 @@ function NavBar() {
     key: "1",
     className: "navbar-item has-dropdown is-hoverable"
   }, React.createElement("a", {
-    className: "navbar-link"
-  }, s.wallet_account_name)), React.createElement("div", {
+    className: "navbar-item"
+  }, s.wallet_account_name), " "), React.createElement("div", {
     key: "2",
     className: "navbar-item"
   }, React.createElement("div", {
@@ -988,11 +994,16 @@ function NavBar() {
   }, React.createElement("i", {
     className: "fas fa-sign-out-alt"
   })), React.createElement("span", null, "Logout")))))])))));
-}
+} //const nearClient = new nearlib.NearClient(
+//window.walletAccount, 
+//new nearlib.LocalNodeConnection(nearConfig.nodeUrl));
+
 
 async function initContract() {
   // Initializing connection to the NEAR DevNet.
-  window.near = await nearlib.dev.connect(nearConfig); // Initializing our contract APIs by contract name and configuration.
+  //window.near = await nearlib.dev.connect(nearConfig);
+  const nearClient = new nearlib.NearClient(window.walletAccount, new nearlib.LocalNodeConnection(nearConfig.nodeUrl));
+  window.near = new nearlib.Near(nearClient); // Initializing our contract APIs by contract name and configuration.
 
   window.contract = await near.loadContract(nearConfig.contractName, {
     // NOTE: This configuration only needed while NEAR is still in development
@@ -1002,8 +1013,8 @@ async function initContract() {
     changeMethods: ["jobInsert", "jobDelete", "droneStartJob", "droneFinishJob", "incrementCounter"],
     // Sender is the account ID to initialize transactions.
     // For devnet we create accounts on demand. See other examples on how to authorize accounts.
-    sender: nearlib.dev.myAccountId //sender: window.walletAccount.getAccountId()
-
+    //sender: nearlib.dev.myAccountId
+    sender: window.walletAccount.getAccountId()
   });
 }
 
