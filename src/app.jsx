@@ -331,7 +331,7 @@ function p_near_signout() {
     window.walletAccount.signOut();
     store.setState("wallet_signed_in", false);
     store.setState("wallet_account_name", "");
-    window.history.replaceState({}, document.title, "/");
+    window.history.replaceState({}, document.title, location.pathname);
 }
 
 
